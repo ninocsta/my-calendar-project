@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Profissional, Servico, Agendamento, Cliente
@@ -102,20 +103,14 @@ class CalendarSyncView(APIView):
         print('Resposta enviada:', response)  # Para debug
         return Response(response)
 
-class ProfissionalListView(APIView):
-    def get(self, request):
-        profissionais = Profissional.objects.all()
-        serializer = ProfissionalSerializer(profissionais, many=True)
-        return Response(serializer.data)
+class ProfissionalViewSet(viewsets.ModelViewSet):
+    queryset = Profissional.objects.all()
+    serializer_class = ProfissionalSerializer
 
-class ServicoListView(APIView):
-    def get(self, request):
-        servicos = Servico.objects.all()
-        serializer = ServicoSerializer(servicos, many=True)
-        return Response(serializer.data)
+class ServicoViewSet(viewsets.ModelViewSet):
+    queryset = Servico.objects.all()
+    serializer_class = ServicoSerializer
 
-class ClienteListView(APIView):
-    def get(self, request):
-        clientes = Cliente.objects.all()
-        serializer = ClienteSerializer(clientes, many=True)
-        return Response(serializer.data)
+class ClienteViewSet(viewsets.ModelViewSet):
+    queryset = Cliente.objects.all()
+    serializer_class = ClienteSerializer

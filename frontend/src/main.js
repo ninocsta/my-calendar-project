@@ -72,6 +72,7 @@ Promise.all([
         timeZone: 'America/Sao_Paulo',
         date: new Date(),
         eventModelClass: Agendamento,
+        timeZone: 'America/Sao_Paulo',        
         crudManager: {
             autoLoad: true,
             autoSync: true,
@@ -146,10 +147,86 @@ Promise.all([
                 }
             }
         },
-        eventRenderer({ eventRecord, renderData }) {
-            renderData.style.backgroundColor = '#e3f2fd';
-            return eventRecord.name;
+        sidebar: {
+            items: {
+                resourceFilter: {
+                    title: 'Profissionais',
+                    selected: profissionais.map(p => p.id)
+
+                },                
+            }
         },
+        modeDefaults: {
+            view: {                
+                strips: {
+                    resourceInfo: {
+                        type: 'widget',
+                        dock: 'header',
+                        cls: 'b-resource-location',
+                        
+                    }
+                }
+            }
+        },
+        modes: {
+            day: null,
+            week: null,
+            month: null,
+            year: null,
+            agenda: null,
+            dayResources: {
+                type: 'resource',
+                title: 'Dia',
+                resourceWidth: '30em',  
+                view: {
+                    type: 'dayview',
+                },            
+                meta: resource => resource.text
+            },
+            weekResources: {
+                type: 'resource',
+                title: 'Semana',
+                resourceWidth: '30em',
+                hideNonWorkingDays: true,
+                view: {
+                    dayStartTime: 8
+                },
+                meta: resource => resource.text
+            },
+            monthResources: {
+                type: 'resource',
+                title: 'Mês',
+                resourceWidth: '30em',
+                hideNonWorkingDays: true,
+                view: {
+                    type: 'monthview'
+                },
+                meta: resource => resource.text
+            }
+        },
+        tbar: {
+            items: {
+                label: {
+                    type: 'label',
+                    text: 'Largura do recurso',
+                    weight: 630
+                },
+                viewWidth: {
+                    type: 'slider',
+                    weight: 640,
+                    min: 12,
+                    max: 100,
+                    value: 30,
+                    width: 90,
+                    unit: 'em',
+                    showValue: true,
+                    showTooltip: true,
+                    onInput({ value }) {
+                        calendar.eachView(v => v.resourceWidth = value + 'em');
+                    }
+                }
+            }
+        },        
         features: {
             eventEdit: {
                 showRecurringUI: false,
@@ -265,7 +342,6 @@ Promise.all([
                     return false;
                 }
 
-                // Set custom fields on the event record
                 eventRecord.set({
                     servico_id: Number(servico_id),
                     resourceId: Number(resourceId),
@@ -280,8 +356,10 @@ Promise.all([
 
                 return true;
             }
-        }
+        }, 
     });
+
+    window.calendar = calendar;
 }).catch(error => {
     console.error('Erro ao carregar dados iniciais dos combos:', error);
     Toast.show({
